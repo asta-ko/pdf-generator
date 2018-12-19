@@ -55,7 +55,7 @@ const validator_result = validate(
         "items": {
             "type": "array",
             "minItems": 2,
-            "maxItems": 2
+            "maxItems": 3
         }
     });
 
@@ -72,10 +72,11 @@ const doc = new PDFDocument({
         bottom: 0,
         left: 20,
         right: 20
-    }
+    },
 });
 
 for (let x of data) {
+    let bigText;
     const count = data.indexOf(x) + 1
     const imagePath = x[0]
     /*if (!fs.existsSync(imagePath)) {
@@ -83,23 +84,32 @@ for (let x of data) {
         return
     }*/
     const text = x[1]
-    renderPage(imagePath, text, count)
+    if (x[2]) {
+        bigText = x[2]
+    }
+
+    renderPage(imagePath, text, bigText, count)
 }
 
-function renderPage(imagePath, text, count) {
+function renderPage(imagePath, text, bigText, count) {
 
     doc.addPage()
-    doc.font('fonts/times.ttf').text(text, 20, 20).moveDown(0.5)
-
+    doc.font('fonts/times.ttf').text(text, 20, 20, {
+        align: 'right'
+    }).moveDown(0.5)
 
 
     const text_height = doc.heightOfString(text, {
         width: 555.28
     });
 
-    if(imagePath != ''){
+    const big_text_height = doc.heightOfString(bigText, {
+        width: 555.28
+    });
+
+    if (imagePath != '') {
         const dimensions = sizeOf(imagePath);
-        if (dimensions.width > dimensions.height) {
+        if (dimensions.width > dimensions.height && !bigText) {
             doc.save()
             doc.rotate(90)
             doc.image(imagePath, 27 + text_height, -575.28, {
@@ -107,15 +117,27 @@ function renderPage(imagePath, text, count) {
                 'valign': 'center'
             })
             doc.restore()
-        } else {
+        } else if (dimensions.width > dimensions.height && bigText) {
+            doc.image(imagePath, {
+                'fit': [555.28, 770],
+                'align': 'center',
+            }).moveDown(1).text(bigText)
+        } else if (dimensions.width < dimensions.height || dimensions.width == dimensions.height) {
             doc.image(imagePath, {
                 'fit': [555.28, 770],
                 'align': 'center',
             })
-        }
-    }
-    doc.text(count, 300, 810)
 
+            if (770 - doc.y > big_text_height) {
+                doc.moveDown(1).text(bigText);
+            }
+
+        } else if (bigText) {
+            doc.text(bigText);
+        }
+        doc.text(count, 300, 810)
+
+    }
 }
 doc.end();
 
