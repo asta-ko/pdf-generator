@@ -78,10 +78,10 @@ const doc = new PDFDocument({
 for (let x of data) {
     const count = data.indexOf(x) + 1
     const imagePath = x[0]
-    if (!fs.existsSync(imagePath)) {
+    /*if (!fs.existsSync(imagePath)) {
         console.log('Incorrect image path: ' + imagePath)
         return
-    }
+    }*/
     const text = x[1]
     renderPage(imagePath, text, count)
 }
@@ -89,28 +89,30 @@ for (let x of data) {
 function renderPage(imagePath, text, count) {
 
     doc.addPage()
-
-    const dimensions = sizeOf(imagePath);
-
     doc.font('fonts/times.ttf').text(text, 20, 20).moveDown(0.5)
+
+
 
     const text_height = doc.heightOfString(text, {
         width: 555.28
     });
 
-    if (dimensions.width > dimensions.height) {
-        doc.save()
-        doc.rotate(90)
-        doc.image(imagePath, 27 + text_height, -575.28, {
-            'fit': [770 - text_height, 555.28],
-            'valign': 'center'
-        })
-        doc.restore()
-    } else {
-        doc.image(imagePath, {
-            'fit': [555.28, 770],
-            'align': 'center',
-        })
+    if(imagePath != ''){
+        const dimensions = sizeOf(imagePath);
+        if (dimensions.width > dimensions.height) {
+            doc.save()
+            doc.rotate(90)
+            doc.image(imagePath, 27 + text_height, -575.28, {
+                'fit': [770 - text_height, 555.28],
+                'valign': 'center'
+            })
+            doc.restore()
+        } else {
+            doc.image(imagePath, {
+                'fit': [555.28, 770],
+                'align': 'center',
+            })
+        }
     }
     doc.text(count, 300, 810)
 

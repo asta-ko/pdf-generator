@@ -7,12 +7,11 @@
     "pdfkit": "^0.8.3",
     "dashdash": "^1.14.1",
     "image-size": "^0.6.3",
-    "jsonschema": "^1.2.4",
-
+    "jsonschema": "^1.2.4"
   },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "asta ko",
+  "author": "asta ko"
 }
